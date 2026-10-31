@@ -1,9 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // This is a private, authenticated bookkeeping app. Every screen
+  // reads the session and live ledger data, so prerender caching is off.
+  cacheComponents: false,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   turbopack: {
     rules: {
       "*.css": {
