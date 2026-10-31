@@ -8,6 +8,7 @@ import {
   userCount,
   verifyPassword,
 } from "@/lib/auth";
+import { friendlyError } from "@/lib/errors";
 import { createUser, findUserByEmail } from "@/lib/queries";
 import { mapUser } from "@/lib/types";
 import { authSchema, fieldErrors, setupSchema } from "@/lib/validations";
@@ -35,20 +36,25 @@ export async function setupOwner(
     return { fieldErrors: fieldErrors(parsed.error) };
   }
 
-  const row = await createUser({
-    name: parsed.data.name,
-    email: parsed.data.email,
-    passwordHash: await hashPassword(parsed.data.password),
-    role: "owner",
-  });
-  const user = mapUser(row);
+  try {
+    const row = await createUser({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      passwordHash: await hashPassword(parsed.data.password),
+      role: "owner",
+    });
+    const user = mapUser(row);
 
-  await createSession({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  });
+    await createSession({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    return { error: friendlyError(error, "Could not create the owner account.") };
+  }
+
   redirect("/dashboard");
 }
 
@@ -65,19 +71,24 @@ export async function login(
     return { fieldErrors: fieldErrors(parsed.error) };
   }
 
-  const row = await findUserByEmail(parsed.data.email);
-  const user = row ? mapUser(row) : null;
+  try {
+    const row = await findUserByEmail(parsed.data.email);
+    const user = row ? mapUser(row) : null;
 
-  if (!user || !(await verifyPassword(parsed.data.password, user.passwordHash))) {
-    return { error: "Email or password is incorrect." };
+    if (!user || !(await verifyPassword(parsed.data.password, user.passwordHash))) {
+      return { error: "Email or password is incorrect." };
+    }
+
+    await createSession({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    return { error: friendlyError(error, "Could not sign in.") };
   }
 
-  await createSession({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  });
   redirect("/dashboard");
 }
 

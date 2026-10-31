@@ -25,7 +25,7 @@ type TokenPayload = {
 };
 
 function getSecret() {
-  const secret = process.env.AUTH_SECRET;
+  const secret = process.env.AUTH_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!secret || secret.length < 32) {
     throw new Error("AUTH_SECRET must be set and at least 32 characters.");
   }
