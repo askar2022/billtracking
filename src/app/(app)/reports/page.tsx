@@ -1,6 +1,7 @@
 import { PeriodFilter } from "@/components/PeriodFilter";
 import { ExportButtons } from "@/components/reports/ExportButtons";
 import { TypeBadge } from "@/components/TypeBadge";
+import { TransactionRowActions } from "@/components/transactions/DeleteButtons";
 import { TYPE_LABELS } from "@/lib/constants";
 import { formatDisplayDate, toDateInput } from "@/lib/dates";
 import { formatUsd, signedAmountCents } from "@/lib/money";
@@ -161,6 +162,7 @@ export default async function ReportsPage({
                 <th>Category</th>
                 <th>Receipt</th>
                 <th>Amount</th>
+                <th className="text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -191,6 +193,9 @@ export default async function ReportsPage({
                     </td>
                     <td className={signed < 0 ? "text-rose-600" : "text-emerald-700"}>
                       {formatUsd(signed, { sign: true })}
+                    </td>
+                    <td>
+                      <TransactionRowActions id={transaction.id} />
                     </td>
                   </tr>
                 );

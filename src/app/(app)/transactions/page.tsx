@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PeriodFilter } from "@/components/PeriodFilter";
 import { TypeBadge } from "@/components/TypeBadge";
 import { PlusIcon } from "@/components/icons";
+import { TransactionRowActions } from "@/components/transactions/DeleteButtons";
 import { PAID_BY_LABELS, TYPE_LABELS, type PaidBy } from "@/lib/constants";
 import { formatDisplayDate } from "@/lib/dates";
 import { formatUsd, signedAmountCents } from "@/lib/money";
@@ -107,6 +108,7 @@ export default async function TransactionsPage({
                 <th>Type</th>
                 <th>Paid by</th>
                 <th>Amount</th>
+                <th className="text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -136,12 +138,15 @@ export default async function TransactionsPage({
                     <td className={signed < 0 ? "text-rose-600" : "text-emerald-700"}>
                       {formatUsd(signed, { sign: true })}
                     </td>
+                    <td>
+                      <TransactionRowActions id={transaction.id} />
+                    </td>
                   </tr>
                 );
               })}
               {transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-slate-500">
+                  <td colSpan={8} className="py-10 text-center text-slate-500">
                     No transactions match these filters.
                   </td>
                 </tr>

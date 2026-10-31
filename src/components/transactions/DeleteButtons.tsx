@@ -1,9 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { deleteTransaction, removeReceipt } from "@/actions/transactions";
 
-export function DeleteTransactionButton({ id }: { id: string }) {
+export function DeleteTransactionButton({
+  id,
+  compact = false,
+}: {
+  id: string;
+  compact?: boolean;
+}) {
   const [confirming, setConfirming] = useState(false);
 
   if (!confirming) {
@@ -11,7 +18,11 @@ export function DeleteTransactionButton({ id }: { id: string }) {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="rounded-full border border-rose-200 px-4 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50"
+        className={
+          compact
+            ? "text-sm font-medium text-rose-600 hover:underline"
+            : "rounded-full border border-rose-200 px-4 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50"
+        }
       >
         Delete
       </button>
@@ -20,21 +31,36 @@ export function DeleteTransactionButton({ id }: { id: string }) {
 
   return (
     <form action={async () => { await deleteTransaction(id); }} className="flex flex-wrap items-center gap-2">
-      <span className="text-sm text-slate-600">Delete this record?</span>
+      {compact ? null : <span className="text-sm text-slate-600">Delete this record?</span>}
       <button
         type="submit"
-        className="rounded-full bg-rose-600 px-4 py-2 text-sm font-semibold text-white"
+        className={
+          compact
+            ? "text-sm font-semibold text-rose-700 hover:underline"
+            : "rounded-full bg-rose-600 px-4 py-2 text-sm font-semibold text-white"
+        }
       >
-        Yes, delete
+        {compact ? "Confirm" : "Yes, delete"}
       </button>
       <button
         type="button"
         onClick={() => setConfirming(false)}
-        className="rounded-full border border-border px-4 py-2 text-sm"
+        className={compact ? "text-sm text-slate-500 hover:underline" : "rounded-full border border-border px-4 py-2 text-sm"}
       >
         Keep
       </button>
     </form>
+  );
+}
+
+export function TransactionRowActions({ id }: { id: string }) {
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-3">
+      <Link href={`/transactions/${id}/edit`} className="text-sm font-medium text-blue-700 hover:underline">
+        Edit
+      </Link>
+      <DeleteTransactionButton id={id} compact />
+    </div>
   );
 }
 

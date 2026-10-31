@@ -3,6 +3,7 @@ import { CategoryDonut, IncomeExpenseChart } from "@/components/dashboard/Dashbo
 import { PeriodFilter } from "@/components/PeriodFilter";
 import { TypeBadge } from "@/components/TypeBadge";
 import { CardIcon, PlusIcon, TrendIcon, UserIcon } from "@/components/icons";
+import { TransactionRowActions } from "@/components/transactions/DeleteButtons";
 import { formatDisplayDate } from "@/lib/dates";
 import { formatUsd, percentChange, signedAmountCents } from "@/lib/money";
 import { getPreviousRange } from "@/lib/dates";
@@ -144,6 +145,7 @@ export default async function DashboardPage({
                   <th>Category</th>
                   <th>Type</th>
                   <th>Amount</th>
+                  <th className="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,12 +167,15 @@ export default async function DashboardPage({
                       <td className={signed < 0 ? "text-rose-600" : "text-emerald-700"}>
                         {formatUsd(signed, { sign: true })}
                       </td>
+                      <td>
+                        <TransactionRowActions id={transaction.id} />
+                      </td>
                     </tr>
                   );
                 })}
                 {recent.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-500">
+                    <td colSpan={7} className="py-8 text-center text-slate-500">
                       No transactions in this period yet.
                     </td>
                   </tr>
