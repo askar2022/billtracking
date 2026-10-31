@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { CategoryDonut, IncomeExpenseChart } from "@/components/dashboard/DashboardCharts";
 import { PeriodFilter } from "@/components/PeriodFilter";
-import { TypeBadge } from "@/components/TypeBadge";
 import { CardIcon, PlusIcon, TrendIcon, UserIcon } from "@/components/icons";
-import { TransactionRowActions } from "@/components/transactions/DeleteButtons";
-import { formatDisplayDate } from "@/lib/dates";
-import { formatUsd, percentChange, signedAmountCents } from "@/lib/money";
+import { TransactionList } from "@/components/transactions/TransactionList";
 import { getPreviousRange } from "@/lib/dates";
+import { formatUsd, percentChange } from "@/lib/money";
 import { parsePeriod, type SearchRecord } from "@/lib/period";
 import {
   getCategorySpending,
@@ -128,61 +126,14 @@ export default async function DashboardPage({
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
-        <div className="card overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4">
+        <div>
+          <div className="mb-3 flex items-center justify-between">
             <h2 className="text-base font-semibold">Recent transactions</h2>
             <Link href="/transactions" className="text-sm font-medium text-blue-700">
               View all
             </Link>
           </div>
-          <div className="table-wrap">
-            <table className="data">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>App / product</th>
-                  <th>Category</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recent.slice(0, 6).map((transaction) => {
-                  const signed = signedAmountCents(transaction.type, transaction.amountCents);
-                  return (
-                    <tr key={transaction.id}>
-                      <td>{formatDisplayDate(transaction.date)}</td>
-                      <td>
-                        <Link href={`/transactions/${transaction.id}`} className="font-medium hover:underline">
-                          {transaction.description}
-                        </Link>
-                      </td>
-                      <td>{transaction.product?.name ?? "—"}</td>
-                      <td>{transaction.category?.name ?? "—"}</td>
-                      <td>
-                        <TypeBadge type={transaction.type} />
-                      </td>
-                      <td className={signed < 0 ? "text-rose-600" : "text-emerald-700"}>
-                        {formatUsd(signed, { sign: true })}
-                      </td>
-                      <td>
-                        <TransactionRowActions id={transaction.id} />
-                      </td>
-                    </tr>
-                  );
-                })}
-                {recent.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-500">
-                      No transactions in this period yet.
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
+          <TransactionList transactions={recent.slice(0, 6)} />
         </div>
 
         <div className="card p-5">

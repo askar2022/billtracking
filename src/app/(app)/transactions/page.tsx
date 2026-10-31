@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { PeriodFilter } from "@/components/PeriodFilter";
-import { TypeBadge } from "@/components/TypeBadge";
 import { PlusIcon } from "@/components/icons";
-import { TransactionRowActions } from "@/components/transactions/DeleteButtons";
-import { PAID_BY_LABELS, TYPE_LABELS, type PaidBy } from "@/lib/constants";
-import { formatDisplayDate } from "@/lib/dates";
-import { formatUsd, signedAmountCents } from "@/lib/money";
+import { TransactionList } from "@/components/transactions/TransactionList";
+import { TYPE_LABELS } from "@/lib/constants";
 import { firstValue, parsePeriod, type SearchRecord } from "@/lib/period";
 import { listCategories, listProducts, listTransactions } from "@/lib/queries";
 import { isTransactionType } from "@/lib/validations";
@@ -96,65 +93,7 @@ export default async function TransactionsPage({
         </button>
       </form>
 
-      <div className="card overflow-hidden">
-        <div className="table-wrap">
-          <table className="data">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>App / product</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Paid by</th>
-                <th>Amount</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction) => {
-                const signed = signedAmountCents(transaction.type, transaction.amountCents);
-                return (
-                  <tr key={transaction.id}>
-                    <td>{formatDisplayDate(transaction.date)}</td>
-                    <td>
-                      <Link href={`/transactions/${transaction.id}`} className="font-medium hover:underline">
-                        {transaction.description}
-                      </Link>
-                      {transaction.receipt ? (
-                        <p className="text-xs text-slate-500">Receipt attached</p>
-                      ) : null}
-                    </td>
-                    <td>{transaction.product?.name ?? "—"}</td>
-                    <td>{transaction.category?.name ?? "—"}</td>
-                    <td>
-                      <TypeBadge type={transaction.type} />
-                    </td>
-                    <td>
-                      {transaction.paidBy
-                        ? PAID_BY_LABELS[transaction.paidBy as PaidBy] ?? transaction.paidBy
-                        : "—"}
-                    </td>
-                    <td className={signed < 0 ? "text-rose-600" : "text-emerald-700"}>
-                      {formatUsd(signed, { sign: true })}
-                    </td>
-                    <td>
-                      <TransactionRowActions id={transaction.id} />
-                    </td>
-                  </tr>
-                );
-              })}
-              {transactions.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-10 text-center text-slate-500">
-                    No transactions match these filters.
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <TransactionList transactions={transactions} />
     </div>
   );
 }
